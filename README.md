@@ -34,6 +34,6 @@ Frtizing application: http://fritzing.org/
 
  2) Download the Zip file or clone this project with git.
 
- 3) Type "sudo python3 4D_Brachiosaurus.py"
+ 3) Type "sudo ./4D_Brachiosaurus.py"
 
 ![4d_brachiosaurus_program](https://user-images.githubusercontent.com/13591438/37248620-aecedd7c-249c-11e8-8752-2985599f7a8b.png)
