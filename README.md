@@ -7,7 +7,7 @@ Use Python and a Raspberry Pi to control an Innonex 4D Brachiosaurus.
 
 ## Requirements:
 
-Innonex 4D Science T-rex from Amazing Toys Ltd.
+Innonex 4D Science  Brachiosaurus from Amazing Toys Ltd.
 
 Raspberry Pi (including power supply, keyboard, mouse, speaker, and monitor).
 
