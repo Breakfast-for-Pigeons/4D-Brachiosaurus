@@ -2,7 +2,8 @@
 
 Use Python and a Raspberry Pi to control an Innonex 4D Brachiosaurus.
 
-Click for 4d_Brachiosaurus video
+![Click for 4d_Brachiosaurus video](https://user-images.githubusercontent.com/13591438/37248617-9fb1ad9c-249c-11e8-9ddc-2bb93437b545.JPG)
+
 
 ## Requirements:
 
@@ -29,10 +30,10 @@ Frtizing application: http://fritzing.org/
 
 1) Connect the Rasberry Pi, Brachiosaurus motor, and electronics as shown in the image below. If you installed the Fritzing application, I included my 4D_Brachiosaurus.fzz file. Feel free to use it. NOTE: The image shows only 2 AA batteries. I actually used 4 AA batteries for this project.
 
-4d_Brachiosaurus
+![4d_brachiosaurus_fritzing](https://user-images.githubusercontent.com/13591438/37248618-aa47c958-249c-11e8-8db6-6b54e8894dcd.png)
 
  2) Download the Zip file or clone this project with git.
 
  3) Type "sudo python3 4D_Brachiosaurus.py"
 
-4d_Brachiosaurus_program
+![4d_brachiosaurus_program](https://user-images.githubusercontent.com/13591438/37248620-aecedd7c-249c-11e8-8752-2985599f7a8b.png)
