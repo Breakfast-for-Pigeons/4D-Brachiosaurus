@@ -2,7 +2,7 @@
 
 Use Python and a Raspberry Pi to control an Innonex 4D Brachiosaurus.
 
-![Click for 4d_Brachiosaurus video](https://user-images.githubusercontent.com/13591438/37248617-9fb1ad9c-249c-11e8-9ddc-2bb93437b545.JPG)
+[![Click for 4d_Brachiosaurus video](https://user-images.githubusercontent.com/13591438/37248667-ca6c9fe6-249d-11e8-8ba9-86e8611f4c17.JPG)](https://www.dropbox.com/s/tbtasc1s2fv91od/4D_Brachiosaurus.AVI?dl=0)
 
 
 ## Requirements:
