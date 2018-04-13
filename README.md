@@ -30,7 +30,7 @@ Frtizing application: http://fritzing.org/
 
 1) Connect the Rasberry Pi, Brachiosaurus motor, and electronics as shown in the image below. If you installed the Fritzing application, I included my 4D_Brachiosaurus.fzz file. Feel free to use it. NOTE: The image shows only 2 AA batteries. I actually used 4 AA batteries for this project.
 
-![4d_brachiosaurus_fritzing](https://user-images.githubusercontent.com/13591438/37248618-aa47c958-249c-11e8-8db6-6b54e8894dcd.png)
+![4d_brachiosaurus](https://user-images.githubusercontent.com/13591438/38753262-77c658f4-3f23-11e8-8d8b-9b1cf8ee6b27.png)
 
  2) Download the Zip file or clone this project with git.
 
