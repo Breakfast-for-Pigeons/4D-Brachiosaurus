@@ -36,4 +36,4 @@ Frtizing application: http://fritzing.org/
 
  3) Type "sudo ./4D_Brachiosaurus.py"
 
-![4d_brachiosaurus_program](https://user-images.githubusercontent.com/13591438/37248620-aecedd7c-249c-11e8-8752-2985599f7a8b.png)
+![4d_brachiosaurus_program](https://user-images.githubusercontent.com/13591438/38753404-de954b12-3f23-11e8-958f-ee33dcd4f64c.png)
