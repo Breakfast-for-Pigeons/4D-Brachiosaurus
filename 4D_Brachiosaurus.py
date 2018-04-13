@@ -25,15 +25,15 @@ from time import sleep
 from signal import pause
 import pygame
 import random
-import os, sys
+import os, sys, logging
 
 ########################################################################
 #                           Variables                                  #
 ########################################################################
 
-brachiosaurus_motor = Motor(2, 3, True)
-brachiosaurus_motor_enable = OutputDevice(4)
-blue_button = Button(22)
+brachiosaurus_motor = Motor(23, 18, True)		# forward, backward, pwm
+brachiosaurus_motor_enable = OutputDevice(24)
+blue_button = Button(25)
 red_button = Button(9) 
 
 ########################################################################
@@ -42,9 +42,56 @@ red_button = Button(9)
 
 pygame.mixer.init()
 
+logging.basicConfig(filename='Files/Brachiosaurus.log', filemode='w',
+	level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s', 
+	datefmt='%m/%d/%y %I:%M:%S %p:')
+
 ########################################################################
 #                            Functions                                 #
 ########################################################################
+'''
+This is the main function. It will wait until one of two buttons is 
+pressed. One button will start the program and the other button will
+stop the program. Pressing Ctrl-C will also stop the program.
+'''
+def main():
+	try:
+		logging.info("START")
+		# Check to see that the necessary files exist
+		file_check()
+		# Check to see if files are accessible
+		permission_check()
+		# Read the dinosaur_facts.txt file to populate the dino_facts list.
+		dino_facts = read_file("Files/dinosaur_facts.txt")
+		# Check to see if the file is empty
+		empty_file_check(dino_facts)
+		# Acknowledge that prelimiary checks are complete
+		logging.info("Prelimiary checks are complete. Starting program...")
+		# Display program header
+		print_header()
+		# Pre-load the first sound file
+		bellow, bellow_length = get_bellow()
+		# Prompt the user to press a button
+		prompt_user_for_input()
+		
+		while True:
+			
+			if blue_button.is_pressed:
+				# Print out a random dinosaur fun fact
+				print_dinosaur_fact(dino_facts)
+				# Move the Brachiosaurus for the duration of the sound file
+				activate_brachiosaurus(bellow, bellow_length)
+				# Prompt the user again to press a button
+				prompt_user_for_input()
+				# Load the next sound file
+				bellow, bellow_length = get_bellow()
+				
+			if red_button.is_pressed:
+				stop_the_program()
+				
+	except KeyboardInterrupt:
+		stop_the_program()
+
 '''
 The file_check function checks to see if the necessary files exist.
 If they all exist, the program will continue.
@@ -52,216 +99,142 @@ If a file is missing, the program will print a message and exit.
 '''
 def file_check():
 	
-	dinosaur_facts_flag = 0
-	brachiosaurus1_flag = 0
-	brachiosaurus2_flag = 0
-	brachiosaurus3_flag = 0
-	brachiosaurus4_flag = 0
-	brachiosaurus5_flag = 0
-	brachiosaurus6_flag = 0
-	brachiosaurus7_flag = 0
-	brachiosaurus8_flag = 0
+	file_missing_flag = 0
 	
-	print("Checking for necessary files:")
+	logging.info("FILE CHECK")
 	# Check to see if dinosaur_facts.txt file exists
-	print("Looking for dinosaur_facts.txt...", end="")
 	if os.path.isfile('Files/dinosaur_facts.txt'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("dinosaur_facts.txt file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		dinosaur_facts_flag = 1
+		detail_log.error("dinosaur_facts.txt file was not found! Make sure that the dinosaur_facts.txt file exists in the Files folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus1.mp3 file exists
-	print("Looking for brachiosaurus1.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus1.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus1.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus1_flag = 1
+		logging.error("brachiosaurus1.mp3 file was not found! Make sure that the brachiosaurus1.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus2.mp3 file exists
-	print("Looking for brachiosaurus2.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus2.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus2.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus2_flag = 1	
+		logging.error("brachiosaurus2.mp3 file was not found! Make sure that the brachiosaurus2.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus3.mp3 file exists
-	print("Looking for brachiosaurus3.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus3.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus3.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus3_flag = 1
+		logging.error("brachiosaurus3.mp3 file was not found! Make sure that the brachiosaurus3.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus4.mp3 file exists
-	print("Looking for brachiosaurus4.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus4.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus4.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus4_flag = 1
+		logging.error("brachiosaurus4.mp3 file was not found! Make sure that the brachiosaurus4.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus5.mp3 file exists
-	print("Looking for brachiosaurus5.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus5.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus5.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus5_flag = 1
+		logging.error("brachiosaurus5.mp3 file was not found! Make sure that the brachiosaurus5.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus6.mp3 file exists
-	print("Looking for brachiosaurus6.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus6.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus6.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus6_flag = 1	
+		logging.error("brachiosaurus6.mp3 file was not found! Make sure that the brachiosaurus6.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus7.mp3 file exists
-	print("Looking for brachiosaurus7.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus7.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus7.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus7_flag = 1
+		logging.error("brachiosaurus7.mp3 file was not found! Make sure that the brachiosaurus7.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 	# Check to see if brachiosaurus8.mp3 file exists
-	print("Looking for brachiosaurus8.mp3...", end="")
 	if os.path.isfile('Sounds/brachiosaurus8.mp3'):
-		print("\033[1;32;40mfound\033[1;37;40m!")
+		logging.info("brachiosaurus8.mp3 file was found!")
 	else:
-		print("\033[1;31;40mnot found\033[1;37;40m!")
-		brachiosaurus8_flag = 1
+		logging.error("brachiosaurus8.mp3 file was not found! Make sure that the brachiosaurus8.mp3 file exists in the 'Sounds' folder.")
+		file_missing_flag = 1
 
-	# If there are no missing files, return to the main function,
-	# otherwise print out messages and exit the program
-	if dinosaur_facts_flag == 0  and brachiosaurus1_flag == 0 and brachiosaurus2_flag == 0 and brachiosaurus3_flag == 0 and brachiosaurus4_flag == 0 and \
-	   brachiosaurus5_flag == 0 and brachiosaurus6_flag == 0 and brachiosaurus7_flag == 0 and brachiosaurus8_flag == 0:
+	# If there are no missing files, return to the main function
+	# Otherwise print out message and exit the program
+	if file_missing_flag == 0:
 		return
 	else:
-		if dinosaur_facts_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the dinosaur_facts.txt file exists in the 'Files' folder.")
-		if brachiosaurus1_flag == 1: 	
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus1.mp3 file exists in the 'Sounds' folder.")
-		if brachiosaurus2_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus2.mp3 file exists in the 'Sounds' folder.") 
-		if brachiosaurus3_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus3.mp3 file exists in the 'Sounds' folder.")
-		if brachiosaurus4_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus4.mp3 file exists in the 'Sounds' folder.")
-		if brachiosaurus5_flag == 1: 	
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus5.mp3 file exists in the 'Sounds' folder.")
-		if brachiosaurus6_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus6.mp3 file exists in the 'Sounds' folder.") 
-		if brachiosaurus7_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus7.mp3 file exists in the 'Sounds' folder.")
-		if brachiosaurus8_flag == 1:
-			print("\033[1;31;40mCheck to make sure that the brachiosaurus8.mp3 file exists in the 'Sounds' folder.")
-		print("\033[1;37;40mExiting program.\n")
-		release_gpio_pins()
-		exit()
+		print("\033[1;31;40mErrors were encountered. Check the log in the 'Files' folder for more details.\033[1;31;40m")
+		stop_the_program()
 
 '''
-The access_file_check function checks to see if the user has permission
+The permission_check function checks to see if the user has permission
 to read the necessary files. If so, the program will continue. If not, 
 messages are printed out to the screen and the program will exit.
 '''
-def access_file_check():
+def permission_check():
 	
-	dinosaur_facts_flag = 0
-	brachiosaurus1_flag = 0
-	brachiosaurus2_flag = 0
-	brachiosaurus3_flag = 0
-	brachiosaurus4_flag = 0
-	brachiosaurus5_flag = 0
-	brachiosaurus6_flag = 0
-	brachiosaurus7_flag = 0
-	brachiosaurus8_flag = 0
+	permission_flag = 0
 	
-	print("Checking to see if user has permission to read the necessary files:")
+	logging.info("PERMISSION CHECK")
 	# Check to see if user has read access to dinosaur_facts.txt
-	print("Does user have read permissions for dinosaur_facts.txt?...", end="")
 	if os.access('Files/dinosaur_facts.txt', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the dinosaur_facts.txt file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		dinosaur_facts_flag = 1
+		logging.error("User does not have permission to read the dinosaur_facts.txt file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus1.mp3
-	print("Does user have read permissions for brachiosaurus1.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus1.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus1.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus1_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus1.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus2.mp3
-	print("Does user have read permissions for brachiosaurus2.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus2.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus2.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus2_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus2.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus3.mp3
-	print("Does user have read permissions for brachiosaurus3.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus3.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus3.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus3_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus3.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus4.mp3
-	print("Does user have read permissions for brachiosaurus4.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus4.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus4.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus4_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus4.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus5.mp3
-	print("Does user have read permissions for brachiosaurus5.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus5.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus5.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus5_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus5.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus6.mp3
-	print("Does user have read permissions for brachiosaurus6.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus6.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus6.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus6_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus6.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus7.mp3
-	print("Does user have read permissions for brachiosaurus7.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus7.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus7.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus7_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus7.mp3 file.")
+		permission_flag = 1
 	# Check to see if user has read access to brachiosaurus8.mp3
-	print("Does user have read permissions for brachiosaurus8.mp3?...", end="")
 	if os.access('Sounds/brachiosaurus8.mp3', os.R_OK):
-		print("\033[1;32;40mYes\033[1;37;40m!")
+		logging.info("User has permission to read the brachiosaurus8.mp3 file.")
 	else:
-		print("\033[1;31;40mNo\033[1;37;40m!")
-		brachiosaurus8_flag = 1
+		logging.error("User does not have permission to read the brachiosaurus8.mp3 file.")
+		permission_flag = 1
 	
-	if dinosaur_facts_flag == 0  and brachiosaurus1_flag == 0 and brachiosaurus2_flag == 0 and brachiosaurus3_flag == 0 and brachiosaurus4_flag == 0 and \
-	   	   brachiosaurus5_flag == 0 and brachiosaurus6_flag == 0 and brachiosaurus7_flag == 0 and brachiosaurus8_flag == 0:
+	if permission_flag == 0:
 		return
 	else:
-		if dinosaur_facts_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Files' folder and the dinosaur_facts.txt file.")
-		if brachiosaurus1_flag == 1: 	
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus1.mp3' file.")
-		if brachiosaurus2_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus2.mp3' file.") 
-		if brachiosaurus3_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus3.mp3' file.")
-		if brachiosaurus4_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus4.mp3' file.")
-		if brachiosaurus5_flag == 1: 	
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus5.mp3' file.")
-		if brachiosaurus6_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus6.mp3' file.") 
-		if brachiosaurus7_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus7.mp3' file.")
-		if brachiosaurus8_flag == 1:
-			print("\033[1;31;40mMake sure that the user has read access to the 'Sounds' folder and the 'brachiosaurus8.mp3' file.")
-		print("\033[1;37;40mExiting program.\n")
-		release_gpio_pins()
-		exit()
+		print("\033[1;31;40mErrors were encountered. Check the log in the 'Files' folder for more details.\033[1;31;40m")
+		stop_the_program()
 '''
 The read_file function will read the dinosaur facts file and each 
 line of the file will be an element in the fun_facts list. It will then
@@ -272,11 +245,9 @@ If the dino_facts file is empty, an error message will be displayed
 and the program will exit.
 '''
 def read_file(file_name):
-	print("\033[1;37;40mReading the dinosaur_facts.txt file...", end="")
-	f = open(file_name, "r")     # open the file as read-only
-	dino_facts = f.readlines()
-	f.close()
-	print("\033[1;32;40mdone\033[1;37;40m!")
+	logging.info("READING DINOSAUR_FACTS.TXT")
+	with open(file_name, "r") as f:   # open the file as read-only
+		dino_facts = f.readlines()
 
 	return dino_facts
 	
@@ -286,20 +257,20 @@ is, the program will print a message to the screen. If not, the program
 will continue.
 '''
 def empty_file_check(file_name):		
-	print("\033[1;37;40mIs the dinosaur_facts.txt file empty?...", end="")
+	logging.info("EMPTY FILE CHECK")
 	if file_name == []:
-		print("\033[1;31;40mYes\033[1;37;40m!")
-		print("\033[1;31;40mThe dinosaur.txt file is empty. The program won't work.")
-		release_gpio_pins()
-		exit()
+		logging.error("The dinosaur.txt file is empty. The program won't work.")
+		print("\033[1;31;40mErrors were encountered. Check the log in the 'Files' folder for more details.\033[1;31;40m")
+		stop_the_program()
 	else:
-		print("\033[1;32;40mNo\033[1;37;40m!")
+		logging.info("The dinosaur.txt file is not empty.(This is good. We don't want an empty file.)")
 		
 '''
 The print_header function will print out the program header to the 
 screen.
 '''
 def print_header():
+	print("\n")
 	print("\033[1;34;40m=====================================================================================")
 	print("\033[1;34;40m  _  _   ____    ____                 _     _                                        ")
 	print("\033[1;34;40m | || | |  _ \  | __ ) _ __ __ _  ___| |__ (_) ___  ___  __ _ _   _ _ __ _   _ ___   ")
@@ -307,7 +278,8 @@ def print_header():
 	print("\033[1;34;40m |__   _| |_| | | |_) | | | (_| | (__| | | | | (_) \__ \ (_| | |_| | |  | |_| \__ \  ")
 	print("\033[1;34;40m    |_| |____/  |____/|_|  \__,_|\___|_| |_|_|\___/|___/\__,_|\__,_|_|   \__,_|___/  ")
 	print("\033[1;34;40m                                                                                     ")
-	print("\033[1;34;40m=====================================================================================\n")
+	print("\033[1;34;40m=====================================================================================")
+	print("\n")
                                                       
 
 '''
@@ -357,6 +329,14 @@ def get_bellow():
 		return bellow, bellow8_length
 
 '''
+The print_dinosaur_fact function prints out a random fact about 
+dinosaurs. The dino_facts file needs to be sent to this function.
+'''
+def print_dinosaur_fact(dino_facts):
+	print("\033[1;34;40mDINOSAUR FUN FACT:")
+	print(random.choice(dino_facts))
+
+'''
 The activate_brachiosaurus funciton takes 2 inputs: bellow and bellow_length. 
 This function will play the sound file and then activate the motor for 
 the duration of the sound file. 
@@ -365,14 +345,14 @@ def activate_brachiosaurus(bellow, bellow_length):
 	try:
 		brachiosaurus_motor.value = 0.6      # Controls the motor speed
 	except ValueError:
-		print("\033[1;31;40mBad value specified for brachiosaurus_motor. Enter a value between 0 and 1.\n")
-		release_gpio_pins()
-		exit()
-	pygame.mixer.music.load(bellow)        # Loads the sound file
-	pygame.mixer.music.play()              # Plays the sound file
-	brachiosaurus_motor_enable.on()        # Starts the motor
+		logging.error("A bad value was specified for brachiosaurus_motor. The value should be between 0 and 1.")
+		print("\033[1;31;40mAn error was encountered. Check the detail log for more information\n")
+		stop_the_program()
+	pygame.mixer.music.load(bellow)          # Loads the sound file
+	pygame.mixer.music.play()              	 # Plays the sound file
+	brachiosaurus_motor_enable.on()        	 # Starts the motor
 	sleep(bellow_length)
-	brachiosaurus_motor_enable.off()       # Stops the motor
+	brachiosaurus_motor_enable.off()       	 # Stops the motor
 
 '''
 The prompt_user_for_input function prompts a user to push a button.
@@ -389,52 +369,12 @@ def release_gpio_pins():
 	brachiosaurus_motor_enable.close()
 	red_button.close()
 	blue_button.close()
+
+def stop_the_program():
+	release_gpio_pins()
+	print("\033[1;37;40mExiting program.\n")
+	logging.info("END")
+	exit()
 	
-'''
-This is the main fucntion. It will wait until one of two buttons is 
-pressed. One button will start the program and the other button will
-stop the program. Pressing Ctrl-C will also stop the program.
-'''
-def main():
-	try:
-		# Check to see that the necessary files exist
-		file_check()
-		# Check to see if files are accessible
-		access_file_check()
-		# Read the dinosaur_facts.txt file to populate the dino_facts list.
-		dino_facts = read_file("Files/dinosaur_facts.txt")
-		# Check to see if the file is empty
-		empty_file_check(dino_facts)
-		# Acknowledge that prelimiary checks are complete
-		print("\033[1;37;40mPrelimiary checks are complete. Starting program...\n")
-		# Display program header
-		print_header()
-		# Pre-load the first sound file
-		bellow, bellow_length = get_bellow()
-		# Prompt the user to press a button
-		prompt_user_for_input()
-		
-		while True:
-			
-			if blue_button.is_pressed:
-				# Print out a random dinosaur fun fact
-				print("\033[1;34;40mDINOSAUR FUN FACT:")
-				print(random.choice(dino_facts))
-				# Move the T. rex for the duration of the sound file
-				activate_brachiosaurus(bellow, bellow_length)
-				# Prompt the user again to press a button
-				prompt_user_for_input()
-				# Load the next sound file
-				bellow, bellow_length = get_bellow()
-				
-			if red_button.is_pressed:
-				print("Exiting program.\n")
-				release_gpio_pins()
-				exit()
-				
-	except KeyboardInterrupt:
-		release_gpio_pins()
-		print("\nExiting program.\n")
-		
 if __name__ == '__main__':
 	main()
