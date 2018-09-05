@@ -10,8 +10,9 @@ pressed to make the Brachiosaurus move and bellow.
 This program is also an example of adding color to text displayed to
 the screen.
 
-
 Author: Paul Ryan
+
+This program was written on a Raspberry Pi using the Geany IDE.
 '''
 
 ########################################################################
@@ -122,11 +123,11 @@ def file_check():
     # Check to see if sound files exists
     for sound in sounds:
         if os.path.isfile('Sounds/' + sound):
-            logging.info("{} file was found!".format(sound))
+            logging.info("%s file was found!", sound)
         else:
-            logging.error("{} file was not found! Make sure ".format(sound) +
-                          "that the {} file exists in the ".format(sound) +
-                          "'Sounds' folder.")
+            logging.error("%s file was not found! Make sure " +
+                          "that the %s file exists in the " +
+                          "'Sounds' folder.", sound, sound)
             file_missing_flag = 1
 
     # If there are no missing files, return to the main function
@@ -168,10 +169,10 @@ def permission_check():
     for sound in sounds:
         if os.access('Sounds/' + sound, os.R_OK):
             logging.info("User has permission to read the " +
-                         "{} file.".format(sound))
+                         "%s file.", sound)
         else:
             logging.error("User does not have permission to read the " +
-                          "{} file.".format(sound))
+                          "%s file.", sound)
             permission_flag = 1
 
     if permission_flag == 0:
@@ -223,8 +224,8 @@ def empty_file_check(list_name):
               "'Files' folder for more information.")
         stop_the_program()
     else:
-        logging.info("The dinosaur.txt file is not empty.(This is good. We " +
-                     "don't want an empty file.)")
+        logging.info("The dinosaur.txt file is not empty.(This is good. "
+                     "We don't want an empty file.)")
 
 
 def print_header():
@@ -239,16 +240,19 @@ def print_header():
     unreadable. This is much better. The program still compiles and runs
     OK.
     '''
-
+    
+    # The r prefix is to let Pylint know that it is a raw string.
+    # It prevents the Pylint message "Anomolous backslash in string:
+    # string constant might be missing an r prefix"
     print("\n\033[1;34;40m")
-    print("=====================================================================================")
-    print("  _  _   ____    ____                 _     _                                        ")
-    print(" | || | |  _ \  | __ ) _ __ __ _  ___| |__ (_) ___  ___  __ _ _   _ _ __ _   _ ___   ")
-    print(" | || |_| | | | |  _ \| '__/ _` |/ __| '_ \| |/ _ \/ __|/ _` | | | | '__| | | / __|  ")
-    print(" |__   _| |_| | | |_) | | | (_| | (__| | | | | (_) \__ \ (_| | |_| | |  | |_| \__ \  ")
-    print("    |_| |____/  |____/|_|  \__,_|\___|_| |_|_|\___/|___/\__,_|\__,_|_|   \__,_|___/  ")
-    print("                                                                                     ")
-    print("=====================================================================================")
+    print(r"=====================================================================================")
+    print(r"  _  _   ____    ____                 _     _                                        ")
+    print(r" | || | |  _ \  | __ ) _ __ __ _  ___| |__ (_) ___  ___  __ _ _   _ _ __ _   _ ___   ")
+    print(r" | || |_| | | | |  _ \| '__/ _` |/ __| '_ \| |/ _ \/ __|/ _` | | | | '__| | | / __|  ")
+    print(r" |__   _| |_| | | |_) | | | (_| | (__| | | | | (_) \__ \ (_| | |_| | |  | |_| \__ \  ")
+    print(r"    |_| |____/  |____/|_|  \__,_|\___|_| |_|_|\___/|___/\__,_|\__,_|_|   \__,_|___/  ")
+    print(r"                                                                                     ")
+    print(r"=====================================================================================")
     print("\n")
 
 
